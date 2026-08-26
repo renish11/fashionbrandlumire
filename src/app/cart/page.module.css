@@ -1,0 +1,108 @@
+.main {
+  min-height: 100vh;
+  padding-top: 120px;
+  padding-bottom: var(--space-20);
+  background: var(--color-background);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-padding);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-lg);
+  font-weight: 500;
+  color: var(--color-on-surface);
+}
+
+.clearBtn {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+.clearBtn:hover {
+  color: var(--color-error);
+}
+
+/* ── Empty ──────────────────────────────────────────────── */
+.emptyWrapper {
+  padding: var(--space-20) 0;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-8);
+  align-items: flex-start;
+}
+
+.itemsCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.itemsList {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  padding: 0 var(--space-6);
+}
+
+.couponRow {
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.couponLabel {
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+}
+
+.summaryCol {
+  min-width: 0;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryCol {
+    order: -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding-top: 80px;
+  }
+
+  .itemsList {
+    padding: 0 var(--space-4);
+  }
+}
