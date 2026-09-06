@@ -1,0 +1,365 @@
+/* =========================================================
+   Lumière Global Styles
+   Design tokens as CSS custom properties
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design Tokens ───────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --color-surface: #faf9f9;
+  --color-surface-bright: #faf9f9;
+  --color-surface-dim: #dbdad9;
+  --color-surface-variant: #e3e2e2;
+  --color-surface-container: #efeded;
+  --color-surface-container-low: #f4f3f3;
+  --color-surface-container-high: #e9e8e8;
+  --color-surface-container-highest: #e3e2e2;
+  --color-surface-container-lowest: #ffffff;
+  --color-background: #faf9f9;
+
+  /* Primary */
+  --color-primary: #000000;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1c1b1b;
+  --color-on-primary-container: #858383;
+  --color-primary-fixed: #e5e2e1;
+  --color-primary-fixed-dim: #c8c6c5;
+  --color-inverse-primary: #c8c6c5;
+
+  /* Secondary */
+  --color-secondary: #5d5f5f;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #dfe0e0;
+  --color-on-secondary-container: #616363;
+
+  /* Tertiary / Gold */
+  --color-tertiary: #000000;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #241a00;
+  --color-on-tertiary-container: #a08000;
+  --color-accent-gold: #d4af37;
+  --color-accent-gold-light: #e9c349;
+  --color-accent-gold-dark: #b8960c;
+
+  /* On-surfaces */
+  --color-on-surface: #1b1c1c;
+  --color-on-surface-variant: #444748;
+  --color-on-background: #1b1c1c;
+
+  /* Outline */
+  --color-outline: #747878;
+  --color-outline-variant: #c4c7c7;
+
+  /* Inverse */
+  --color-inverse-surface: #2f3031;
+  --color-inverse-on-surface: #f2f0f0;
+
+  /* Error */
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  /* Status */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+
+  /* Admin */
+  --color-dashboard-bg: #fafafa;
+  --color-border-subtle: #e5e5e5;
+
+  /* ── Typography ──────────────────────────────────────── */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Font sizes */
+  --text-display-lg: 64px;
+  --text-display-md: 48px;
+  --text-headline-lg: 32px;
+  --text-headline-md: 24px;
+  --text-headline-sm: 20px;
+  --text-body-lg: 18px;
+  --text-body-md: 16px;
+  --text-body-sm: 13px;
+  --text-label-sm: 12px;
+  --text-label-caps: 11px;
+
+  /* Line heights */
+  --lh-display-lg: 72px;
+  --lh-display-md: 56px;
+  --lh-headline-lg: 40px;
+  --lh-headline-md: 32px;
+  --lh-headline-sm: 28px;
+  --lh-body-lg: 28px;
+  --lh-body-md: 24px;
+  --lh-body-sm: 18px;
+  --lh-label: 16px;
+
+  /* ── Spacing ─────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  --container-max: 1440px;
+  --container-padding: 32px;
+  --gutter: 24px;
+  --sidebar-width: 260px;
+  --sidebar-collapsed: 72px;
+
+  /* ── Border radius ───────────────────────────────────── */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ─────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+
+  /* ── Transitions ─────────────────────────────────────── */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Z-index scale ───────────────────────────────────── */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-overlay: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  line-height: var(--lh-body-md);
+  color: var(--color-on-surface);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* ── Utilities ───────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-padding);
+}
+
+/* ── Focus ring ──────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface-container-low);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
+
+/* ── Selection ───────────────────────────────────────────── */
+::selection {
+  background-color: var(--color-accent-gold);
+  color: #000;
+}
+
+/* ── Responsive breakpoints ──────────────────────────────── */
+/* Mobile: < 768px  */
+/* Tablet: 768px – 1024px */
+/* Desktop: > 1024px */
+
+@media (max-width: 768px) {
+  :root {
+    --text-display-lg: 40px;
+    --lh-display-lg: 48px;
+    --text-display-md: 32px;
+    --lh-display-md: 40px;
+    --text-headline-lg: 24px;
+    --lh-headline-lg: 32px;
+    --container-padding: 20px;
+  }
+}
+
+/* ── Admin Console Light Theme Overrides ─────────────────── */
+html.light body {
+  background-color: #f8f9fa !important;
+  color: #18181b !important;
+}
+
+html.light .bg-\[\#0c0c0c\],
+html.light .bg-\[\#0d0d0d\] {
+  background-color: #f8f9fa !important;
+  color: #18181b !important;
+}
+
+html.light .bg-\[\#141414\] {
+  background-color: #ffffff !important;
+  border-color: #e4e4e7 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+html.light .bg-\[\#161616\],
+html.light .bg-\[\#181818\] {
+  background-color: #f4f4f5 !important;
+  color: #27272a !important;
+}
+
+html.light .bg-\[\#111111\]\/80 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e4e4e7 !important;
+}
+
+html.light .border-\[\#262626\],
+html.light .border-\[\#202020\],
+html.light .border-\[\#2b2b2b\] {
+  border-color: #e4e4e7 !important;
+}
+
+html.light .divide-\[\#202020\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #f4f4f5 !important;
+}
+
+/* Only convert text-white to dark text if it is NOT on a dark container */
+html.light .text-white:not(.bg-black):not(.bg-zinc-800):not(.bg-zinc-900):not(.bg-zinc-950):not(.bg-rose-600):not(.bg-emerald-600):not([class*="bg-black"]):not([class*="bg-zinc-800"]):not([class*="bg-zinc-900"]):not(#printable-receipt *):not(.keep-white) {
+  color: #09090b !important;
+}
+
+html.light #printable-receipt .text-white,
+html.light #printable-receipt .bg-black {
+  color: #ffffff !important;
+}
+
+html.light .text-zinc-400 {
+  color: #52525b !important;
+}
+
+html.light .text-zinc-500 {
+  color: #71717a !important;
+}
+
+html.light .text-zinc-300 {
+  color: #27272a !important;
+}
+
+html.light input[type="text"],
+html.light input[type="password"],
+html.light input[type="email"],
+html.light input[type="search"] {
+  background-color: #ffffff !important;
+  border-color: #d4d4d8 !important;
+  color: #09090b !important;
+}
+
+html.light input::placeholder {
+  color: #a1a1aa !important;
+}
+
+html.light .hover\:bg-white\/\[0\.02\]:hover {
+  background-color: #fafafa !important;
+}
+
