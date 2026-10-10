@@ -25,7 +25,7 @@ export default function AdminOrdersPage() {
     });
   }, [search, statusFilter]);
 
-  const statuses = ["processing", "shipped", "delivered"];
+  const statuses = ["processing", "shipped", "delivered", "return_requested", "returned", "cancelled"];
 
   const getStatusBadgeStyle = (status: string) => {
     if (isLight) {
@@ -40,6 +40,10 @@ export default function AdminOrdersPage() {
           return "bg-purple-100 text-purple-800 border border-purple-300 font-semibold";
         case "cancelled":
           return "bg-rose-100 text-rose-800 border border-rose-300 font-semibold";
+        case "return_requested":
+          return "bg-orange-100 text-orange-800 border border-orange-300 font-semibold";
+        case "returned":
+          return "bg-zinc-200 text-zinc-800 border border-zinc-400 font-semibold";
         default:
           return "bg-zinc-100 text-zinc-800 border border-zinc-300";
       }
@@ -55,6 +59,10 @@ export default function AdminOrdersPage() {
           return "bg-purple-950/60 text-purple-400 border border-purple-800/40";
         case "cancelled":
           return "bg-rose-950/60 text-rose-400 border border-rose-800/40";
+        case "return_requested":
+          return "bg-orange-950/60 text-orange-400 border border-orange-800/40";
+        case "returned":
+          return "bg-zinc-800/80 text-zinc-300 border border-zinc-600";
         default:
           return "bg-zinc-800 text-zinc-400 border border-zinc-700";
       }
@@ -273,7 +281,7 @@ export default function AdminOrdersPage() {
                         o.status
                       )}`}
                     >
-                      {o.status}
+                      {o.status.replace("_", " ")}
                     </span>
                   </td>
 
@@ -286,21 +294,43 @@ export default function AdminOrdersPage() {
                   </td>
 
                   <td className="py-3.5 px-3 text-right">
-                    <button
-                      onClick={() => setSelectedOrderForReceipt(o)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-xs group whitespace-nowrap ${
-                        isLight
-                          ? "bg-amber-100/90 text-amber-900 border border-amber-300 hover:bg-[#D4AF37] hover:text-black hover:border-[#D4AF37]"
-                          : "bg-[#D4AF37]/15 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black border border-[#D4AF37]/35"
-                      }`}
-                      title="View Meesho/Amazon style Shipping Label & Tax Invoice"
-                    >
-                      <FileText
-                        size={13}
-                        className="transition-transform group-hover:scale-110 shrink-0"
-                      />
-                      <span>Order Preview</span>
-                    </button>
+                    <div className="flex flex-col items-end gap-2">
+                      <button
+                        onClick={() => setSelectedOrderForReceipt(o)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-xs group whitespace-nowrap ${
+                          isLight
+                            ? "bg-amber-100/90 text-amber-900 border border-amber-300 hover:bg-[#D4AF37] hover:text-black hover:border-[#D4AF37]"
+                            : "bg-[#D4AF37]/15 text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black border border-[#D4AF37]/35"
+                        }`}
+                        title="View Meesho/Amazon style Shipping Label & Tax Invoice"
+                      >
+                        <FileText
+                          size={13}
+                          className="transition-transform group-hover:scale-110 shrink-0"
+                        />
+                        <span>Order Preview</span>
+                      </button>
+                      
+                      {o.status === "return_requested" && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              await fetch(`/api/orders/${o.id}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ status: 'returned' })
+                              });
+                              window.location.reload();
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300"
+                        >
+                          Approve Return
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

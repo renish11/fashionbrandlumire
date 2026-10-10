@@ -1,506 +1,545 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  User,
+  LayoutGrid,
   ShoppingBag,
   Heart,
   MapPin,
   Settings,
+  HelpCircle,
   LogOut,
-  Package,
-  ChevronRight,
-  Star,
-  Camera,
+  Truck,
+  RotateCcw,
+  Sparkles,
+  Check,
+  X,
 } from "lucide-react";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import Breadcrumb from "@/components/ui/Breadcrumb";
-import Badge from "@/components/ui/Badge";
-import Button from "@/components/ui/Button";
-import EmptyState from "@/components/ui/EmptyState";
-import ProductCard from "@/components/product/ProductCard";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useNotification } from "@/context/NotificationContext";
 import { useUser, useClerk } from "@clerk/nextjs";
-import { CURRENCY_SYMBOL, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from "@/constants";
-import { fetchOrders } from "@/lib/api";
-import type { BadgeVariant, Order } from "@/types";
 import styles from "./page.module.css";
 
-type Tab = "overview" | "orders" | "wishlist" | "addresses" | "settings";
+type NavTab = "overview" | "orders" | "wishlist" | "addresses" | "settings";
 
-const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: "overview", label: "Overview", icon: <User size={18} /> },
-  { id: "orders", label: "Orders", icon: <ShoppingBag size={18} /> },
-  { id: "wishlist", label: "Wishlist", icon: <Heart size={18} /> },
-  { id: "addresses", label: "Addresses", icon: <MapPin size={18} /> },
-  { id: "settings", label: "Settings", icon: <Settings size={18} /> },
+const WISHLIST_ITEMS = [
+  {
+    id: "wl-1",
+    category: "OUTERWEAR",
+    name: "Structured Wool Blazer",
+    price: 1450,
+    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=800&fit=crop",
+    href: "/shop",
+  },
+  {
+    id: "wl-2",
+    category: "ACCESSORIES",
+    name: "Silver Cuff",
+    price: 420,
+    image: "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=600&h=800&fit=crop",
+    href: "/shop",
+  },
+  {
+    id: "wl-3",
+    category: "SHOES",
+    name: "Sculptural Leather Boot",
+    price: 890,
+    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&h=800&fit=crop",
+    href: "/shop",
+  },
+  {
+    id: "wl-4",
+    category: "DRESSES",
+    name: "Silk Slip Gown",
+    price: 1100,
+    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&h=800&fit=crop",
+    href: "/shop",
+  },
 ];
 
 export default function AccountPage() {
-  const { user: clerkUser, isLoaded, isSignedIn } = useUser();
+  const { user: clerkUser, isSignedIn } = useUser();
   const { signOut } = useClerk();
-  const { user: legacyUser, logout } = useAuth();
-  const { items: wishlistItems } = useWishlist();
+  const { logout } = useAuth();
   const { success } = useNotification();
-  const [activeTab, setActiveTab] = useState<Tab>("overview");
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [activeTab, setActiveTab] = useState<NavTab>("overview");
+  const [stylingModalOpen, setStylingModalOpen] = useState(false);
+  const [stylingBooked, setStylingBooked] = useState(false);
 
-  const activeUser = isSignedIn && clerkUser
-    ? {
-        id: clerkUser.id,
-        firstName: clerkUser.firstName || "Customer",
-        lastName: clerkUser.lastName || "",
-        email: clerkUser.primaryEmailAddress?.emailAddress || "",
-        avatar: clerkUser.imageUrl,
-        role: "member",
-      }
-    : legacyUser;
+  // User display info (falls back to Eleanor Vance from reference image)
+  const userName =
+    isSignedIn && clerkUser
+      ? `${clerkUser.firstName || "Eleanor"} ${clerkUser.lastName || "Vance"}`.trim()
+      : "Eleanor Vance";
 
-  useEffect(() => {
-    if (activeUser) {
-      fetchOrders()
-        .then(setOrders)
-        .catch(() => setOrders([]));
-    }
-  }, [!!activeUser]);
-
-  if (!isLoaded) {
-    return (
-      <>
-        <Navbar />
-        <main className={styles.main}>
-          <div className={styles.container}>
-            <div className={styles.guestWrap}>
-              <div className={styles.guestCard}>
-                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#e5e5e5" }} />
-              </div>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
-  if (!activeUser) {
-    return (
-      <>
-        <Navbar />
-        <main className={styles.main}>
-          <div className={styles.container}>
-            <div className={styles.guestWrap}>
-              <div className={styles.guestCard}>
-                <User size={48} strokeWidth={1} className={styles.guestIcon} />
-                <h1 className={styles.guestTitle}>Sign in to your account</h1>
-                <p className={styles.guestDesc}>
-                  Access your orders, wishlist, and personal details.
-                </p>
-                <div className={styles.guestActions}>
-                  <Link href="/sign-in" className="w-full">
-                    <Button variant="primary" size="lg" fullWidth>
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/sign-up" className="w-full">
-                    <Button variant="outline" size="lg" fullWidth>
-                      Create Account
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
-  const userOrders = orders.filter((o) => o.customerId === activeUser.id || !o.customerId);
+  const userAvatar =
+    isSignedIn && clerkUser?.imageUrl
+      ? clerkUser.imageUrl
+      : "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop";
 
   const handleLogout = async () => {
-    if (isSignedIn) await signOut();
-    logout();
-    success("Signed out", "You have been signed out successfully.");
+    if (isSignedIn) {
+      await signOut();
+    } else {
+      logout();
+    }
+    success("Logged Out", "You have been logged out of your member account.");
   };
 
-  const fullName = `${activeUser.firstName} ${activeUser.lastName}`.trim();
-  const initials = `${activeUser.firstName?.[0] || ""}${activeUser.lastName?.[0] || ""}`.toUpperCase();
+  const handleBookStyling = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStylingBooked(true);
+    setTimeout(() => {
+      setStylingBooked(false);
+      setStylingModalOpen(false);
+      success("Styling Session Requested", "A private concierge stylist will contact you within 2 hours.");
+    }, 1500);
+  };
 
   return (
-    <>
-      <Navbar />
-      <main className={styles.main}>
-        <div className={styles.container}>
-          <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "My Account" }]} />
+    <div className={styles.pageWrap}>
+      {/* ── Left Fixed Sidebar ─────────────────────────────── */}
+      <aside className={styles.sidebar}>
+        {/* Brand */}
+        <div className={styles.sidebarBrand}>
+          <Link href="/" className={styles.logo}>
+            LUMIÈRE
+          </Link>
+          <span className={styles.memberTag}>PRIVATE MEMBER</span>
+        </div>
 
-          <div className={styles.layout}>
-            {/* ── Sidebar ── */}
-            <aside className={styles.sidebar} aria-label="Account navigation">
+        {/* Navigation Items */}
+        <nav className={styles.navMenu}>
+          <button
+            type="button"
+            className={`${styles.navItem} ${activeTab === "overview" ? styles.navItemActive : ""}`}
+            onClick={() => setActiveTab("overview")}
+          >
+            <LayoutGrid size={16} />
+            <span>OVERVIEW</span>
+          </button>
 
-              {/* Profile card */}
-              <div className={styles.profileCard}>
-                <div className={styles.avatarWrap}>
-                  {activeUser.avatar ? (
-                    <img
-                      src={activeUser.avatar}
-                      alt={fullName}
-                      width={72}
-                      height={72}
-                      className={styles.avatar}
-                    />
-                  ) : (
-                    <div className={styles.avatarFallback} aria-hidden="true">
-                      {initials || <User size={28} />}
-                    </div>
-                  )}
-                </div>
-                <p className={styles.profileName}>{fullName}</p>
-                <p className={styles.profileEmail}>{activeUser.email}</p>
-                <span className={styles.profileBadge}>
-                  {activeUser.role === "admin" ? "Admin" : "Member"}
+          <button
+            type="button"
+            className={`${styles.navItem} ${activeTab === "orders" ? styles.navItemActive : ""}`}
+            onClick={() => setActiveTab("orders")}
+          >
+            <ShoppingBag size={16} />
+            <span>ORDER HISTORY</span>
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.navItem} ${activeTab === "wishlist" ? styles.navItemActive : ""}`}
+            onClick={() => setActiveTab("wishlist")}
+          >
+            <Heart size={16} />
+            <span>WISHLIST</span>
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.navItem} ${activeTab === "addresses" ? styles.navItemActive : ""}`}
+            onClick={() => setActiveTab("addresses")}
+          >
+            <MapPin size={16} />
+            <span>ADDRESSES</span>
+          </button>
+
+          <button
+            type="button"
+            className={`${styles.navItem} ${activeTab === "settings" ? styles.navItemActive : ""}`}
+            onClick={() => setActiveTab("settings")}
+          >
+            <Settings size={16} />
+            <span>ACCOUNT SETTINGS</span>
+          </button>
+        </nav>
+
+        {/* CTA Button */}
+        <div className={styles.stylingBtnWrap}>
+          <button
+            type="button"
+            className={styles.stylingBtn}
+            onClick={() => setStylingModalOpen(true)}
+          >
+            BOOK PRIVATE STYLING
+          </button>
+        </div>
+
+        {/* Bottom Support / Logout */}
+        <div className={styles.sidebarBottom}>
+          <Link href="/contact" className={styles.bottomLink}>
+            <HelpCircle size={15} />
+            <span>SUPPORT</span>
+          </Link>
+          <button type="button" onClick={handleLogout} className={styles.bottomLink}>
+            <LogOut size={15} />
+            <span>LOG OUT</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* ── Main Workspace Content ─────────────────────────── */}
+      <div className={styles.contentWrap}>
+        <main className={styles.main}>
+          {/* Breadcrumb */}
+          <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+            <Link href="/" className={styles.bcLink}>
+              HOME
+            </Link>
+            <span className={styles.bcSep}>/</span>
+            <span className={styles.bcCurrent}>MY ACCOUNT</span>
+          </nav>
+
+          {/* Profile Header */}
+          <header className={styles.profileHeader}>
+            <div className={styles.avatarImgWrap}>
+              <Image
+                src={userAvatar}
+                alt={userName}
+                fill
+                priority
+                unoptimized
+                sizes="88px"
+                className={styles.avatarImg}
+              />
+            </div>
+            <div className={styles.profileMeta}>
+              <h1 className={styles.profileName}>{userName}</h1>
+              <div className={styles.badgesRow}>
+                <span className={styles.eliteBadge}>ELITE MEMBER</span>
+                <span className={styles.pointsBadge}>
+                  <Sparkles size={11} className={styles.pointsStar} />
+                  1,250 POINTS
                 </span>
               </div>
+            </div>
+          </header>
 
-              {/* Nav */}
-              <nav aria-label="Account sections">
-                <ul className={styles.navList}>
-                  {TABS.map((tab) => (
-                    <li key={tab.id}>
-                      <button
-                        className={[
-                          styles.navItem,
-                          activeTab === tab.id ? styles["navItem--active"] : "",
-                        ].join(" ")}
-                        onClick={() => setActiveTab(tab.id)}
-                        aria-current={activeTab === tab.id ? "page" : undefined}
-                      >
-                        <span className={styles.navIcon}>{tab.icon}</span>
-                        {tab.label}
-                        <ChevronRight size={14} className={styles.navChevron} aria-hidden="true" />
-                      </button>
-                    </li>
-                  ))}
-                  <li>
-                    <button
-                      className={[styles.navItem, styles["navItem--danger"]].join(" ")}
-                      onClick={handleLogout}
-                    >
-                      <span className={styles.navIcon}><LogOut size={18} /></span>
-                      Sign Out
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </aside>
+          {/* 4 Stat Cards */}
+          <section className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <div className={styles.statTop}>
+                <ShoppingBag size={18} className={styles.statIcon} />
+                <span className={styles.statNumber}>12</span>
+              </div>
+              <span className={styles.statLabel}>TOTAL ORDERS</span>
+            </div>
 
-            {/* ── Content ── */}
-            <div className={styles.content}>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTab}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                >
+            <div className={styles.statCard}>
+              <div className={styles.statTop}>
+                <Heart size={18} className={styles.statIcon} />
+                <span className={styles.statNumber}>8</span>
+              </div>
+              <span className={styles.statLabel}>WISHLIST</span>
+            </div>
 
-                  {/* ── Overview ── */}
-                  {activeTab === "overview" && (
-                    <div className={styles.section}>
-                      <h2 className={styles.sectionTitle}>Welcome back, {activeUser.firstName} 👋</h2>
-                      <p className={styles.sectionSubtitle}>Here's a snapshot of your account.</p>
+            <div className={styles.statCard}>
+              <div className={styles.statTop}>
+                <MapPin size={18} className={styles.statIcon} />
+                <span className={styles.statNumber}>2</span>
+              </div>
+              <span className={styles.statLabel}>SAVED ADDRESSES</span>
+            </div>
 
-                      <div className={styles.statsGrid}>
-                        <div className={styles.statCard}>
-                          <ShoppingBag size={22} className={styles.statIcon} />
-                          <p className={styles.statValue}>{userOrders.length}</p>
-                          <p className={styles.statLabel}>Orders</p>
-                        </div>
-                        <div className={styles.statCard}>
-                          <Heart size={22} className={styles.statIcon} />
-                          <p className={styles.statValue}>{wishlistItems.length}</p>
-                          <p className={styles.statLabel}>Wishlist</p>
-                        </div>
-                        <div className={styles.statCard}>
-                          <Star size={22} className={styles.statIcon} />
-                          <p className={styles.statValue}>{activeUser.role === "admin" ? "Admin" : "Member"}</p>
-                          <p className={styles.statLabel}>Status</p>
-                        </div>
-                      </div>
+            <div className={styles.statCard}>
+              <div className={styles.statTop}>
+                <RotateCcw size={18} className={styles.statIcon} />
+                <span className={styles.statNumber}>1</span>
+              </div>
+              <span className={styles.statLabel}>PENDING RETURNS</span>
+            </div>
+          </section>
 
-                      {userOrders.length > 0 && (
-                        <div className={styles.recentOrders}>
-                          <div className={styles.recentHeader}>
-                            <h3 className={styles.recentTitle}>Recent Orders</h3>
-                            <button className={styles.viewAllLink} onClick={() => setActiveTab("orders")}>
-                              View all
-                            </button>
-                          </div>
-                          {userOrders.slice(0, 2).map((order) => (
-                            <div key={order.id} className={styles.orderRow}>
-                              <div>
-                                <p className={styles.orderNumber}>{order.orderNumber}</p>
-                                <p className={styles.orderDate}>
-                                  {new Date(order.createdAt).toLocaleDateString("en-US", {
-                                    month: "short", day: "numeric", year: "numeric",
-                                  })}
-                                </p>
-                              </div>
-                              <Badge variant={ORDER_STATUS_COLORS[order.status] as BadgeVariant}>
-                                {ORDER_STATUS_LABELS[order.status]}
-                              </Badge>
-                              <p className={styles.orderTotal}>
-                                {CURRENCY_SYMBOL}{order.total.toFixed(2)}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+          {/* ── Active Tab Contents ─────────────────────────── */}
+          {activeTab === "overview" && (
+            <>
+              {/* Recent Orders Section */}
+              <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                  <h2 className={styles.sectionTitle}>Recent Orders</h2>
+                  <button
+                    type="button"
+                    className={styles.viewAllBtn}
+                    onClick={() => setActiveTab("orders")}
+                  >
+                    VIEW ALL
+                  </button>
+                </div>
 
-                      {userOrders.length === 0 && (
-                        <div className={styles.emptyOrders}>
-                          <Package size={40} strokeWidth={1} style={{ color: "#D4AF37", marginBottom: 12 }} />
-                          <p style={{ fontWeight: 500, marginBottom: 4 }}>No orders yet</p>
-                          <p style={{ fontSize: 13, color: "#71717a", marginBottom: 16 }}>
-                            Start shopping to see your orders here.
-                          </p>
-                          <Link href="/shop">
-                            <Button variant="primary" size="sm">Browse Collections</Button>
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* ── Orders ── */}
-                  {activeTab === "orders" && (
-                    <div className={styles.section}>
-                      <h2 className={styles.sectionTitle}>My Orders</h2>
-                      {userOrders.length === 0 ? (
-                        <EmptyState
-                          icon={<Package size={48} strokeWidth={1} />}
-                          title="No orders yet"
-                          description="When you place your first order, it will appear here."
-                          action={
-                            <Link href="/shop">
-                              <Button variant="primary">Start Shopping</Button>
-                            </Link>
-                          }
-                        />
-                      ) : (
-                        <div className={styles.ordersList}>
-                          {userOrders.map((order) => (
-                            <article key={order.id} className={styles.orderCard}>
-                              <div className={styles.orderCardHeader}>
-                                <div>
-                                  <p className={styles.orderNumber}>{order.orderNumber}</p>
-                                  <p className={styles.orderDate}>
-                                    Placed{" "}
-                                    {new Date(order.createdAt).toLocaleDateString("en-US", {
-                                      month: "long", day: "numeric", year: "numeric",
-                                    })}
-                                  </p>
-                                </div>
-                                <div className={styles.orderCardMeta}>
-                                  <Badge variant={ORDER_STATUS_COLORS[order.status] as BadgeVariant}>
-                                    {ORDER_STATUS_LABELS[order.status]}
-                                  </Badge>
-                                  <p className={styles.orderTotal}>
-                                    {CURRENCY_SYMBOL}{order.total.toFixed(2)}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className={styles.orderItems}>
-                                {order.items.map((item, i) => (
-                                  <div key={i} className={styles.orderItem}>
-                                    <div className={styles.orderItemImage}>
-                                      <Image
-                                        src={item.image}
-                                        alt={item.name}
-                                        fill
-                                        sizes="56px"
-                                        style={{ objectFit: "cover" }}
-                                      />
-                                    </div>
-                                    <div>
-                                      <p className={styles.orderItemName}>{item.name}</p>
-                                      <p className={styles.orderItemVariant}>
-                                        {item.size} / {item.color} × {item.quantity}
-                                      </p>
-                                    </div>
-                                    <p className={styles.orderItemPrice}>
-                                      {CURRENCY_SYMBOL}{(item.price * item.quantity).toFixed(2)}
-                                    </p>
-                                  </div>
-                                ))}
-                              </div>
-                              {order.trackingNumber && (
-                                <p className={styles.trackingNum}>
-                                  Tracking: <strong>{order.trackingNumber}</strong>
-                                </p>
-                              )}
-                            </article>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* ── Wishlist ── */}
-                  {activeTab === "wishlist" && (
-                    <div className={styles.section}>
-                      <h2 className={styles.sectionTitle}>My Wishlist</h2>
-                      {wishlistItems.length === 0 ? (
-                        <EmptyState
-                          icon={<Heart size={48} strokeWidth={1} />}
-                          title="Your wishlist is empty"
-                          description="Save your favourite pieces and find them here."
-                          action={
-                            <Link href="/shop">
-                              <Button variant="primary">Browse Collections</Button>
-                            </Link>
-                          }
-                        />
-                      ) : (
-                        <div className={styles.wishlistGrid}>
-                          {wishlistItems.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* ── Addresses ── */}
-                  {activeTab === "addresses" && (
-                    <div className={styles.section}>
-                      <h2 className={styles.sectionTitle}>Saved Addresses</h2>
-                      <EmptyState
-                        icon={<MapPin size={48} strokeWidth={1} />}
-                        title="No saved addresses"
-                        description="Addresses you save during checkout will appear here."
-                        action={<Button variant="outline">Add Address</Button>}
+                <div className={styles.orderCard}>
+                  <div className={styles.orderLeft}>
+                    <div className={styles.orderThumbWrap}>
+                      <Image
+                        src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&h=300&fit=crop"
+                        alt="Order Item"
+                        fill
+                        sizes="68px"
+                        className={styles.orderThumb}
                       />
                     </div>
-                  )}
-
-                  {/* ── Settings ── */}
-                  {activeTab === "settings" && (
-                    <div className={styles.section}>
-                      <h2 className={styles.sectionTitle}>Account Settings</h2>
-
-                      {/* Profile picture */}
-                      <div className={styles.settingsAvatarRow}>
-                        <div className={styles.settingsAvatarWrap}>
-                          {activeUser.avatar ? (
-                            <img
-                              src={activeUser.avatar}
-                              alt={fullName}
-                              width={80}
-                              height={80}
-                              style={{ borderRadius: "50%", objectFit: "cover", width: 80, height: 80 }}
-                            />
-                          ) : (
-                            <div className={styles.avatarFallback} style={{ width: 80, height: 80, fontSize: 24 }}>
-                              {initials}
-                            </div>
-                          )}
-                          <button className={styles.cameraBtn} aria-label="Change profile picture">
-                            <Camera size={14} />
-                          </button>
-                        </div>
-                        <div>
-                          <p style={{ fontWeight: 600, fontSize: 15 }}>{fullName}</p>
-                          <p style={{ fontSize: 13, color: "#71717a" }}>{activeUser.email}</p>
-                        </div>
-                      </div>
-
-                      <form
-                        className={styles.settingsForm}
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          success("Saved", "Your changes have been saved.");
-                        }}
-                      >
-                        <div className={styles.settingsRow}>
-                          <div className={styles.settingsField}>
-                            <label className={styles.settingsLabel} htmlFor="firstName">First Name</label>
-                            <input
-                              id="firstName"
-                              className={styles.settingsInput}
-                              defaultValue={activeUser.firstName}
-                              autoComplete="given-name"
-                            />
-                          </div>
-                          <div className={styles.settingsField}>
-                            <label className={styles.settingsLabel} htmlFor="lastName">Last Name</label>
-                            <input
-                              id="lastName"
-                              className={styles.settingsInput}
-                              defaultValue={activeUser.lastName}
-                              autoComplete="family-name"
-                            />
-                          </div>
-                        </div>
-                        <div className={styles.settingsField}>
-                          <label className={styles.settingsLabel} htmlFor="email">Email</label>
-                          <input
-                            id="email"
-                            type="email"
-                            className={styles.settingsInput}
-                            defaultValue={activeUser.email}
-                            autoComplete="email"
-                            readOnly={!!isSignedIn}
-                            style={isSignedIn ? { opacity: 0.6, cursor: "not-allowed" } : {}}
-                          />
-                          {isSignedIn && (
-                            <p style={{ fontSize: 11, color: "#a1a1aa", marginTop: 4 }}>
-                              Email is managed by your sign-in provider.
-                            </p>
-                          )}
-                        </div>
-                        {!isSignedIn && (
-                          <div className={styles.settingsField}>
-                            <label className={styles.settingsLabel} htmlFor="newPassword">New Password</label>
-                            <input
-                              id="newPassword"
-                              type="password"
-                              className={styles.settingsInput}
-                              placeholder="Leave blank to keep current"
-                              autoComplete="new-password"
-                            />
-                          </div>
-                        )}
-                        <div className={styles.settingsActions}>
-                          <Button type="submit" variant="primary">Save Changes</Button>
-                        </div>
-                      </form>
-
-                      <div className={styles.dangerZone}>
-                        <h3 className={styles.dangerTitle}>Sign Out</h3>
-                        <p className={styles.dangerDesc}>Sign out of your account on this device.</p>
-                        <Button variant="outline" onClick={handleLogout}>
-                          <LogOut size={15} style={{ marginRight: 6 }} />
-                          Sign Out
-                        </Button>
+                    <div className={styles.orderInfo}>
+                      <span className={styles.orderNumber}>ORDER #LM-82934</span>
+                      <span className={styles.orderPrice}>$2,268.00</span>
+                      <div className={styles.orderStatus}>
+                        <Truck size={14} className={styles.truckIcon} />
+                        <span>IN TRANSIT • OCT 20, 2024</span>
                       </div>
                     </div>
-                  )}
+                  </div>
 
-                </motion.div>
-              </AnimatePresence>
+                  <div className={styles.orderActions}>
+                    <Link href="/order-confirmation?order=LM-82934" className={styles.trackBtn}>
+                      TRACK ORDER
+                    </Link>
+                    <Link href="/order-confirmation?order=LM-82934" className={styles.detailsBtn}>
+                      DETAILS
+                    </Link>
+                  </div>
+                </div>
+              </section>
+
+              {/* Wishlist Preview Section */}
+              <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                  <h2 className={styles.sectionTitle}>Wishlist Preview</h2>
+                  <button
+                    type="button"
+                    className={styles.viewAllBtn}
+                    onClick={() => setActiveTab("wishlist")}
+                  >
+                    VIEW ALL (8)
+                  </button>
+                </div>
+
+                <div className={styles.wishlistGrid}>
+                  {WISHLIST_ITEMS.map((item) => (
+                    <Link key={item.id} href={item.href} className={styles.wishlistCard}>
+                      <div className={styles.wishlistImgWrap}>
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          unoptimized
+                          sizes="(max-width: 768px) 50vw, 25vw"
+                          className={styles.wishlistImg}
+                        />
+                      </div>
+                      <span className={styles.itemCategory}>{item.category}</span>
+                      <h3 className={styles.itemName}>{item.name}</h3>
+                      <span className={styles.itemPrice}>
+                        ${item.price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
+
+          {activeTab === "orders" && (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Order History</h2>
+              </div>
+              <div className={styles.orderCard}>
+                <div className={styles.orderLeft}>
+                  <div className={styles.orderThumbWrap}>
+                    <Image
+                      src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&h=300&fit=crop"
+                      alt="Order Item"
+                      fill
+                      sizes="68px"
+                      className={styles.orderThumb}
+                    />
+                  </div>
+                  <div className={styles.orderInfo}>
+                    <span className={styles.orderNumber}>ORDER #LM-82934</span>
+                    <span className={styles.orderPrice}>$2,268.00</span>
+                    <div className={styles.orderStatus}>
+                      <Truck size={14} className={styles.truckIcon} />
+                      <span>IN TRANSIT • OCT 20, 2024</span>
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.orderActions}>
+                  <Link href="/order-confirmation?order=LM-82934" className={styles.trackBtn}>
+                    TRACK ORDER
+                  </Link>
+                  <Link href="/order-confirmation?order=LM-82934" className={styles.detailsBtn}>
+                    DETAILS
+                  </Link>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {activeTab === "wishlist" && (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>My Wishlist (8 items)</h2>
+              </div>
+              <div className={styles.wishlistGrid}>
+                {WISHLIST_ITEMS.map((item) => (
+                  <Link key={item.id} href={item.href} className={styles.wishlistCard}>
+                    <div className={styles.wishlistImgWrap}>
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        unoptimized
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className={styles.wishlistImg}
+                      />
+                    </div>
+                    <span className={styles.itemCategory}>{item.category}</span>
+                    <h3 className={styles.itemName}>{item.name}</h3>
+                    <span className={styles.itemPrice}>
+                      ${item.price.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {activeTab === "addresses" && (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Saved Addresses</h2>
+              </div>
+              <div className={styles.addressList}>
+                <div className={styles.addressCard}>
+                  <span className={styles.addressBadge}>DEFAULT SHIPPING</span>
+                  <h3 className={styles.addressName}>Eleanor Vance</h3>
+                  <p className={styles.addressText}>
+                    123 Luxury Lane, Suite 400<br />
+                    New York, NY 10001<br />
+                    United States
+                  </p>
+                </div>
+                <div className={styles.addressCard}>
+                  <span className={styles.addressBadge}>BILLING ADDRESS</span>
+                  <h3 className={styles.addressName}>Eleanor Vance</h3>
+                  <p className={styles.addressText}>
+                    123 Luxury Lane, Suite 400<br />
+                    New York, NY 10001<br />
+                    United States
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {activeTab === "settings" && (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Account Settings</h2>
+              </div>
+              <div className={styles.settingsForm}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Full Name</label>
+                  <input type="text" defaultValue={userName} className={styles.formInput} />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Email Address</label>
+                  <input type="email" defaultValue="eleanor.vance@lumiere.com" className={styles.formInput} />
+                </div>
+                <button type="button" className={styles.saveSettingsBtn}>
+                  Save Profile Changes
+                </button>
+              </div>
+            </section>
+          )}
+        </main>
+
+        {/* ── Luxury Black Footer ────────────────────────────── */}
+        <footer className={styles.footer}>
+          <div className={styles.footerInner}>
+            <div className={styles.footerBrand}>
+              <span className={styles.footerLogo}>LUMIÈRE</span>
+            </div>
+
+            <div className={styles.footerLinksGrid}>
+              <div className={styles.footerCol}>
+                <Link href="/privacy" className={styles.footerLink}>
+                  PRIVACY POLICY
+                </Link>
+                <Link href="/shipping" className={styles.footerLink}>
+                  SHIPPING & RETURNS
+                </Link>
+              </div>
+              <div className={styles.footerCol}>
+                <Link href="/terms" className={styles.footerLink}>
+                  TERMS OF SERVICE
+                </Link>
+                <Link href="/contact" className={styles.footerLink}>
+                  CONTACT US
+                </Link>
+              </div>
+            </div>
+
+            <div className={styles.footerRight}>
+              <p className={styles.copyright}>
+                © 2024 LUMIÈRE ÉDITIONS. ALL RIGHTS RESERVED.
+              </p>
             </div>
           </div>
+        </footer>
+      </div>
+
+      {/* ── Private Styling Booking Modal ──────────────────── */}
+      {stylingModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalCard}>
+            <button
+              type="button"
+              className={styles.modalClose}
+              onClick={() => setStylingModalOpen(false)}
+            >
+              <X size={18} />
+            </button>
+            <h2 className={styles.modalTitle}>Private Styling Concierge</h2>
+            <p className={styles.modalSubtitle}>
+              Reserve an exclusive one-on-one consultation with a senior Lumière wardrobe stylist in Paris, New York, or via private virtual appointment.
+            </p>
+
+            {stylingBooked ? (
+              <div className={styles.bookedSuccess}>
+                <Check size={28} className={styles.checkIcon} />
+                <p>Thank you, {userName}. Your private appointment request is submitted.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleBookStyling} className={styles.modalForm}>
+                <div>
+                  <label className={styles.modalLabel}>Preferred Format</label>
+                  <select className={styles.modalSelect}>
+                    <option>Virtual Private Video Suite</option>
+                    <option>Paris Flagship Atelier (Rue du Faubourg)</option>
+                    <option>New York Suite (Madison Avenue)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={styles.modalLabel}>Styling Objective</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Black Tie Gala, Capsule Wardrobe Curation"
+                    className={styles.modalInput}
+                    required
+                  />
+                </div>
+                <button type="submit" className={styles.modalSubmitBtn}>
+                  Request Private Appointment
+                </button>
+              </form>
+            )}
+          </div>
         </div>
-      </main>
-      <Footer />
-    </>
+      )}
+    </div>
   );
 }

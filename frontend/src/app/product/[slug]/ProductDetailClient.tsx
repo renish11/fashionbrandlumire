@@ -44,6 +44,9 @@ export default function ProductDetailClient({ product, related }: ProductDetailC
   const [qty, setQty] = useState(1);
   const [accordionOpen, setAccordionOpen] = useState<string | null>("description");
   const [adding, setAdding] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewForm, setReviewForm] = useState({ rating: 5, title: "", body: "" });
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   const inWishlist = isInWishlist(product.id);
   const selectedVariant = product.variants.find(
@@ -69,6 +72,19 @@ export default function ProductDetailClient({ product, related }: ProductDetailC
       return;
     }
     setAdding(true);
+    
+    // Simulate recording an abandoned cart
+    fetch("/api/marketing/abandoned-cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        timestamp: new Date().toISOString()
+      }),
+    }).catch(() => {});
+
     await new Promise((r) => setTimeout(r, 300));
     addItem({
       id: `${product.id}-${selectedSize}-${selectedColor.name}`,
@@ -86,6 +102,27 @@ export default function ProductDetailClient({ product, related }: ProductDetailC
     });
     success("Added to cart", `${product.name} — ${selectedSize} / ${selectedColor.name}`);
     setAdding(false);
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewForm.title || !reviewForm.body) {
+      error("Incomplete", "Please provide a title and your review text.");
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      // In a real app, send to backend.
+      // await fetch(`/api/products/${product.slug}/reviews`, { ... })
+      
+      success("Review Submitted", "Thank you for your feedback!");
+      setShowReviewForm(false);
+      setReviewForm({ rating: 5, title: "", body: "" });
+    } catch (err) {
+      error("Error", "Failed to submit review.");
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   const accordions = [
@@ -467,21 +504,78 @@ export default function ProductDetailClient({ product, related }: ProductDetailC
               <div className={styles.reviewsMeta}>
                 <div className={styles.reviewsRating}>
                   <span className={styles.bigRating}>{product.rating}</span>
-                  <div>
-                    <div className={styles.stars} aria-hidden="true">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          size={16}
-                          fill={i < Math.round(product.rating) ? "currentColor" : "none"}
-                          className={i < Math.round(product.rating) ? styles.starFilled : styles.starEmpty}
-                        />
-                      ))}
-                    </div>
+                  <div className="flex items-center gap-4 mt-2">
                     <p className={styles.reviewsCount}>Based on {product.reviewCount} reviews</p>
+                    <Button variant="outline" size="sm" onClick={() => setShowReviewForm(!showReviewForm)}>
+                      Write a Review
+                    </Button>
                   </div>
                 </div>
               </div>
+              
+              <AnimatePresence>
+                {showReviewForm && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    style={{ overflow: "hidden", marginBottom: "2rem" }}
+                  >
+                    <form onSubmit={handleSubmitReview} className="bg-zinc-50 p-6 rounded-xl border border-zinc-200">
+                      <h3 className="text-lg font-serif mb-4">Write a Review</h3>
+                      
+                      <div className="mb-4">
+                        <label className="block text-xs font-semibold uppercase tracking-wider mb-2">Rating</label>
+                        <div className="flex gap-1">
+                          {[1,2,3,4,5].map(num => (
+                            <button
+                              key={num}
+                              type="button"
+                              onClick={() => setReviewForm(prev => ({ ...prev, rating: num }))}
+                              className="text-amber-400 focus:outline-none"
+                            >
+                              <Star size={20} fill={num <= reviewForm.rating ? "currentColor" : "none"} />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <label className="block text-xs font-semibold uppercase tracking-wider mb-2">Review Title</label>
+                        <input
+                          type="text"
+                          required
+                          value={reviewForm.title}
+                          onChange={(e) => setReviewForm(prev => ({ ...prev, title: e.target.value }))}
+                          className="w-full border border-zinc-300 rounded-lg p-2 text-sm focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none"
+                          placeholder="Summarize your experience"
+                        />
+                      </div>
+                      
+                      <div className="mb-4">
+                        <label className="block text-xs font-semibold uppercase tracking-wider mb-2">Review</label>
+                        <textarea
+                          required
+                          rows={4}
+                          value={reviewForm.body}
+                          onChange={(e) => setReviewForm(prev => ({ ...prev, body: e.target.value }))}
+                          className="w-full border border-zinc-300 rounded-lg p-2 text-sm focus:border-amber-600 focus:ring-1 focus:ring-amber-600 outline-none resize-y"
+                          placeholder="Tell us what you thought about this piece..."
+                        />
+                      </div>
+                      
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" type="button" onClick={() => setShowReviewForm(false)}>
+                          Cancel
+                        </Button>
+                        <Button variant="primary" type="submit" loading={submittingReview}>
+                          Submit Review
+                        </Button>
+                      </div>
+                    </form>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <div className={styles.reviewsGrid}>
                 {product.reviews.map((review) => (
                   <article key={review.id} className={styles.reviewCard}>

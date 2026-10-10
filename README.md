@@ -38,7 +38,9 @@ fashionbrandlumire/
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies
+
 Dependencies have been installed in both sub-projects. If cloning anew:
+
 ```bash
 cd frontend && npm install
 cd ../backend && npm install
@@ -49,12 +51,14 @@ cd ../backend && npm install
 You can run both concurrently from the root directory:
 
 **Terminal 1 (Backend API & Admin Portal — Port 4000):**
+
 ```bash
 npm run dev:backend
 # or: cd backend && npm run dev
 ```
 
 **Terminal 2 (Customer Storefront — Port 3000):**
+
 ```bash
 npm run dev:frontend
 # or: cd frontend && npm run dev
@@ -102,7 +106,7 @@ The checkout system supports **Razorpay Checkout** (Cards, UPI, NetBanking, Wall
 ## 📡 Backend API Reference
 
 | Method | Endpoint | Description |
-|---|---|---|
+| --- | --- | --- |
 | `GET` | `/api/products` | Get all products (supports `?filter=featured\|new\|bestseller`, `?category=...`, `?search=...`) |
 | `GET` | `/api/products/[slug]` | Get details for a single piece by slug |
 | `GET` | `/api/orders` | List orders (supports `?customerId=...`) |
@@ -116,6 +120,7 @@ The checkout system supports **Razorpay Checkout** (Cards, UPI, NetBanking, Wall
 ## 👗 Women's-Only Brand Focus
 
 All references to Men's categories have been completely removed from:
+
 - Header navigation menus and category dropdowns
 - Homepage hero tiles and category showcase grid
 - Footer links

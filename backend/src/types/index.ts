@@ -126,6 +126,8 @@ export type OrderStatus =
   | "shipped"
   | "delivered"
   | "cancelled"
+  | "return_requested"
+  | "returned"
   | "refunded";
 
 export interface OrderItem {

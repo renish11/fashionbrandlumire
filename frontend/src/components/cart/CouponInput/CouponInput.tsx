@@ -59,21 +59,21 @@ export default function CouponInput() {
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
-          placeholder="Coupon code"
+          placeholder="Discount code"
           className={styles.input}
-          aria-label="Coupon code"
+          aria-label="Discount code"
           maxLength={20}
           autoComplete="off"
         />
       </div>
       <Button
         type="submit"
-        variant="outline"
+        variant="secondary"
         size="sm"
         loading={loading}
         disabled={!code.trim()}
       >
-        Apply
+        APPLY
       </Button>
     </form>
   );

@@ -81,7 +81,7 @@ export default function RootLayout({
           colorInputText: "#18181b",
           borderRadius: "0.75rem",
           fontFamily: "var(--font-inter), system-ui, sans-serif",
-        },
+        } as any,
         elements: {
           formButtonPrimary:
             "bg-[#D4AF37] hover:bg-[#c5a030] text-black font-bold text-xs tracking-[0.1em] uppercase py-3 rounded-xl transition-all shadow-md hover:shadow-lg",

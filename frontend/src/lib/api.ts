@@ -58,6 +58,13 @@ export async function fetchOrders(): Promise<Order[]> {
   return apiFetch<Order[]>("/api/orders");
 }
 
+export async function updateOrderStatus(orderId: string, status: Order["status"]): Promise<Order> {
+  return apiFetch<Order>(`/api/orders/${orderId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}
+
 // ── Coupons ───────────────────────────────────────────────
 
 export async function validateCoupon(

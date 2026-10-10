@@ -320,7 +320,7 @@ export default function SignUpPage() {
                     colorInputText: "#18181b",
                     borderRadius: "0.75rem",
                     fontFamily: "'Inter', system-ui, sans-serif",
-                  },
+                  } as any,
                   elements: {
                     rootBox: "w-full",
                     card: "shadow-none border-0 p-0 bg-transparent w-full",

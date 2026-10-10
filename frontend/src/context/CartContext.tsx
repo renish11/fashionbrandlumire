@@ -15,6 +15,7 @@ interface CartState {
   items: CartItem[];
   couponCode: string;
   discount: number;
+  shippingMethod: string;
 }
 
 type CartAction =
@@ -23,6 +24,7 @@ type CartAction =
   | { type: "UPDATE_QUANTITY"; payload: { id: string; quantity: number } }
   | { type: "APPLY_COUPON"; payload: { code: string; discount: number } }
   | { type: "REMOVE_COUPON" }
+  | { type: "SET_SHIPPING_METHOD"; payload: string }
   | { type: "CLEAR" };
 
 interface CartContextValue {
@@ -34,11 +36,13 @@ interface CartContextValue {
   discount: number;
   total: number;
   couponCode: string;
+  shippingMethod: string;
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   applyCoupon: (code: string) => boolean;
   removeCoupon: () => void;
+  setShippingMethod: (method: string) => void;
   clearCart: () => void;
   isInCart: (productId: string, color: string, size: string) => boolean;
 }
@@ -84,8 +88,10 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return { ...state, couponCode: action.payload.code, discount: action.payload.discount };
     case "REMOVE_COUPON":
       return { ...state, couponCode: "", discount: 0 };
+    case "SET_SHIPPING_METHOD":
+      return { ...state, shippingMethod: action.payload };
     case "CLEAR":
-      return { items: [], couponCode: "", discount: 0 };
+      return { items: [], couponCode: "", discount: 0, shippingMethod: "standard" };
     default:
       return state;
   }
@@ -102,6 +108,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     items: [],
     couponCode: "",
     discount: 0,
+    shippingMethod: "standard",
   });
 
   const subtotal = useMemo(
@@ -109,7 +116,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [state.items]
   );
 
-  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST;
+  const shipping = state.shippingMethod === "express" ? 25 : (subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : SHIPPING_COST);
   const discountAmount = (subtotal * state.discount) / 100;
   const tax = (subtotal - discountAmount) * TAX_RATE;
   const total = subtotal - discountAmount + shipping + tax;
@@ -128,9 +135,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const applyCoupon = useCallback((code: string): boolean => {
-    const discount = VALID_COUPONS[code.toUpperCase()];
+    const upperCode = code.toUpperCase();
+    let discount = VALID_COUPONS[upperCode];
+
+    if (!discount && typeof window !== "undefined") {
+      try {
+        const custom = localStorage.getItem("lumiere_custom_coupons");
+        if (custom) {
+          const map = JSON.parse(custom);
+          if (map[upperCode]) {
+            discount = map[upperCode];
+          }
+        }
+      } catch {}
+    }
+
     if (discount) {
-      dispatch({ type: "APPLY_COUPON", payload: { code: code.toUpperCase(), discount } });
+      dispatch({ type: "APPLY_COUPON", payload: { code: upperCode, discount } });
       return true;
     }
     return false;
@@ -138,6 +159,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const removeCoupon = useCallback(() => {
     dispatch({ type: "REMOVE_COUPON" });
+  }, []);
+
+  const setShippingMethod = useCallback((method: string) => {
+    dispatch({ type: "SET_SHIPPING_METHOD", payload: method });
   }, []);
 
   const clearCart = useCallback(() => {
@@ -161,11 +186,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     discount: discountAmount,
     total,
     couponCode: state.couponCode,
+    shippingMethod: state.shippingMethod,
     addItem,
     removeItem,
     updateQuantity,
     applyCoupon,
     removeCoupon,
+    setShippingMethod,
     clearCart,
     isInCart,
   };

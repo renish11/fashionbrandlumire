@@ -56,7 +56,7 @@
 }
 
 .sectionBody {
-  padding: 0 var(--space-6) var(--space-6);
+  padding: var(--space-5) var(--space-6) var(--space-6);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -168,6 +168,26 @@
   color: var(--color-on-surface);
 }
 
+/* ── Shipping Methods ───────────────────────────────────── */
+.shippingMethodInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 2px;
+}
+
+.shippingTime {
+  font-size: 11px;
+  color: var(--color-on-surface-variant);
+}
+
+.shippingPrice {
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  color: var(--color-on-surface);
+  margin-left: auto;
+}
+
 /* ── Card fields ────────────────────────────────────────── */
 .cardFields {
   display: flex;
@@ -226,6 +246,6 @@
 
 @media (max-width: 640px) {
   .sectionBody {
-    padding: 0 var(--space-4) var(--space-4);
+    padding: var(--space-4);
   }
 }

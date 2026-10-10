@@ -1,17 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { ShieldCheck, Truck } from "lucide-react";
+import { Lock, RefreshCcw } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { CURRENCY_SYMBOL, FREE_SHIPPING_THRESHOLD } from "@/constants";
+import CouponInput from "@/components/cart/CouponInput";
 import styles from "./OrderSummary.module.css";
 
 export default function OrderSummary() {
-  const { items, subtotal, shipping, tax, discount, total, couponCode, totalItems } = useCart();
+  const { items, subtotal, shipping, tax, discount, total, couponCode, totalItems, shippingMethod } = useCart();
 
   return (
     <aside className={styles.summary} aria-label="Order summary">
-      <h2 className={styles.heading}>Your Order</h2>
+      <h2 className={styles.heading}>Order Summary</h2>
 
       {/* Items list */}
       <ul className={styles.items} aria-label="Cart items">
@@ -33,7 +34,7 @@ export default function OrderSummary() {
             <div className={styles.itemInfo}>
               <p className={styles.itemName}>{item.name}</p>
               <p className={styles.itemVariant}>
-                {item.size} / {item.color}
+                Size: {item.size}
               </p>
             </div>
             <p className={styles.itemPrice}>
@@ -46,10 +47,18 @@ export default function OrderSummary() {
       {/* Divider */}
       <hr className={styles.divider} />
 
+      {/* Discount Code */}
+      <div className={styles.couponSection}>
+        <CouponInput />
+      </div>
+
+      {/* Divider */}
+      <hr className={styles.divider} />
+
       {/* Totals */}
       <dl className={styles.lines}>
         <div className={styles.line}>
-          <dt>Subtotal ({totalItems} {totalItems === 1 ? "item" : "items"})</dt>
+          <dt>Subtotal</dt>
           <dd>{CURRENCY_SYMBOL}{subtotal.toFixed(2)}</dd>
         </div>
 
@@ -61,7 +70,11 @@ export default function OrderSummary() {
         )}
 
         <div className={styles.line}>
-          <dt>Shipping</dt>
+          <dt>Shipping
+            <span className={styles.shippingLabel}>
+              {shippingMethod === "express" ? " (Express)" : " (Standard)"}
+            </span>
+          </dt>
           <dd>
             {shipping === 0
               ? <span className={styles.free}>Free</span>
@@ -70,13 +83,13 @@ export default function OrderSummary() {
         </div>
 
         <div className={styles.line}>
-          <dt>Tax (8%)</dt>
+          <dt>Taxes</dt>
           <dd>{CURRENCY_SYMBOL}{tax.toFixed(2)}</dd>
         </div>
 
         <div className={[styles.line, styles["line--total"]].join(" ")}>
           <dt>Total</dt>
-          <dd>{CURRENCY_SYMBOL}{total.toFixed(2)}</dd>
+          <dd><span className={styles.usdLabel}>USD</span> {CURRENCY_SYMBOL}{total.toFixed(2)}</dd>
         </div>
       </dl>
 
@@ -89,12 +102,12 @@ export default function OrderSummary() {
       {/* Trust badges */}
       <div className={styles.trust}>
         <div className={styles.trustItem}>
-          <ShieldCheck size={15} aria-hidden="true" />
-          <span>Secure SSL checkout</span>
+          <Lock size={13} aria-hidden="true" />
+          <span>SECURE</span>
         </div>
         <div className={styles.trustItem}>
-          <Truck size={15} aria-hidden="true" />
-          <span>Free returns within 30 days</span>
+          <RefreshCcw size={13} aria-hidden="true" />
+          <span>30-DAY RETURNS</span>
         </div>
       </div>
     </aside>

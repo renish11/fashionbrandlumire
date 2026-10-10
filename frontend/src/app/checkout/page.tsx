@@ -18,9 +18,13 @@ export default function CheckoutPage() {
   const { items } = useCart();
   const router = useRouter();
 
-  // Redirect to cart if empty
+  // Redirect to cart if empty (only if not currently navigating to order confirmation)
   useEffect(() => {
     if (items.length === 0) {
+      if (typeof window !== "undefined") {
+        const orderPlaced = sessionStorage.getItem("lumiere_order_placed");
+        if (orderPlaced) return;
+      }
       router.replace("/cart");
     }
   }, [items.length, router]);

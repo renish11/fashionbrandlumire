@@ -12,6 +12,8 @@ import {
   ExternalLink,
   Sun,
   Moon,
+  RefreshCcw,
+  Tag,
 } from "lucide-react";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 
@@ -62,6 +64,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     { label: "Overview", href: "/admin", icon: LayoutDashboard },
     { label: "Products", href: "/admin/products", icon: Package },
     { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
+    { label: "Promo Codes", href: "/admin/promocodes", icon: Tag },
+    { label: "Returns", href: "/admin/returns", icon: RefreshCcw },
     { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   ];
 

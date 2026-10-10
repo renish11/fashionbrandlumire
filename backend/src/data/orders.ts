@@ -113,6 +113,27 @@ export const orders: Order[] = [
     createdAt: "2026-08-10T11:00:00Z",
     updatedAt: "2026-08-12T09:15:00Z",
   },
+  {
+    id: "ord-006",
+    orderNumber: "LUM-2026-4899",
+    customerId: "cust-001",
+    customerName: "Sophia Marchetti",
+    customerEmail: "sophia@example.com",
+    items: [
+      { productId: "p6", name: "Classic Trench Coat", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=200&h=200&fit=crop", price: 350, quantity: 1, size: "S", color: "Beige" },
+    ],
+    shippingAddress: { firstName: "Sophia", lastName: "Marchetti", email: "sophia@example.com", phone: "+1 555 0101", address1: "450 Park Avenue", city: "New York", state: "NY", zip: "10022", country: "United States" },
+    billingAddress: { firstName: "Sophia", lastName: "Marchetti", email: "sophia@example.com", phone: "+1 555 0101", address1: "450 Park Avenue", city: "New York", state: "NY", zip: "10022", country: "United States" },
+    status: "return_requested",
+    paymentMethod: "card",
+    subtotal: 350,
+    shipping: 0,
+    tax: 28,
+    discount: 0,
+    total: 378,
+    createdAt: "2026-08-25T11:00:00Z",
+    updatedAt: "2026-08-28T09:15:00Z",
+  },
 ];
 
 export const customers: Customer[] = [

@@ -10,7 +10,6 @@ import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import CartItem from "@/components/cart/CartItem";
 import CartSummary from "@/components/cart/CartSummary";
-import CouponInput from "@/components/cart/CouponInput";
 import { useCart } from "@/context/CartContext";
 import styles from "./page.module.css";
 
@@ -73,9 +72,7 @@ export default function CartPage() {
                 </ul>
 
                 {/* Coupon below items */}
-                <div className={styles.couponRow}>
-                  <p className={styles.couponLabel}>Have a coupon?</p>
-                  <CouponInput />
+                <div className={styles.couponRow} style={{ display: 'none' }}>
                 </div>
               </div>
 

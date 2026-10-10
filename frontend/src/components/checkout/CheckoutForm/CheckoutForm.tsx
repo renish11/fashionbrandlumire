@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,6 +27,7 @@ const schema = z.object({
   zip: z.string().min(3, "ZIP / Postal code is required"),
   country: z.string().min(1, "Country is required"),
   paymentMethod: z.string().min(1, "Select a payment method"),
+  shippingMethod: z.string().min(1, "Select a shipping method"),
   sameAsBilling: z.boolean().optional(),
 });
 
@@ -53,9 +54,10 @@ function loadRazorpayScript(): Promise<boolean> {
 
 export default function CheckoutForm() {
   const router = useRouter();
-  const { clearCart, total, items } = useCart();
+  const { clearCart, total, items, setShippingMethod, subtotal, shipping, tax, discount, shippingMethod: cartShippingMethod } = useCart();
   const { success, error } = useNotification();
   const [shippingOpen, setShippingOpen] = useState(true);
+  const [shippingMethodOpen, setShippingMethodOpen] = useState(true);
   const [paymentOpen, setPaymentOpen] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -69,26 +71,65 @@ export default function CheckoutForm() {
     defaultValues: {
       country: "United States",
       paymentMethod: "razorpay",
+      shippingMethod: "standard",
       sameAsBilling: true,
     },
   });
 
   const paymentMethod = watch("paymentMethod");
+  const shippingMethod = watch("shippingMethod");
+
+  // Sync shipping method with global cart state for total calculations
+  
+  useEffect(() => {
+    setShippingMethod(shippingMethod);
+  }, [shippingMethod, setShippingMethod]);
+
+  // Save order snapshot to sessionStorage and localStorage so the confirmation page can display it
+  const saveOrderSnapshot = (data: FormValues, orderNumber: string) => {
+    try {
+      const snapshot = {
+        orderNumber,
+        items: items.length > 0 ? items : undefined,
+        subtotal: subtotal > 0 ? subtotal : undefined,
+        shipping: shipping,
+        tax: tax > 0 ? tax : undefined,
+        discount: discount > 0 ? discount : undefined,
+        total: total > 0 ? total : undefined,
+        shippingMethod: cartShippingMethod || "standard",
+        address: {
+          firstName: data.firstName || "Eleanor",
+          lastName: data.lastName || "Vance",
+          address1: data.address1 || "123 Luxury Lane, Suite 400",
+          address2: data.address2 || "",
+          city: data.city || "New York",
+          state: data.state || "NY",
+          zip: data.zip || "10001",
+          country: data.country || "United States",
+        },
+        paymentMethod: data.paymentMethod,
+      };
+      sessionStorage.setItem("lumiere_order_snapshot", JSON.stringify(snapshot));
+      sessionStorage.setItem("lumiere_order_placed", "true");
+      localStorage.setItem("lumiere_order_snapshot", JSON.stringify(snapshot));
+    } catch {}
+  };
 
   const onSubmit = async (data: FormValues) => {
     setSubmitting(true);
-    const orderNumber = `LUM-${Date.now().toString().slice(-6)}`;
+    const orderNumber = `LM-${Date.now().toString().slice(-5)}`;
 
     // ── Flow 1: Cash on Delivery ──────────────────────────
     if (data.paymentMethod === "cod") {
       try {
-        await new Promise((r) => setTimeout(r, 600));
-        clearCart();
+        await new Promise((r) => setTimeout(r, 400));
+        saveOrderSnapshot(data, orderNumber);
         success(
-          "Order placed with Cash on Delivery!",
-          `Order ${orderNumber} is confirmed. Payment will be collected upon arrival.`
+          "Order Confirmed!",
+          `Order #${orderNumber} placed successfully with Cash on Delivery.`
         );
-        router.push(`/account?tab=orders&order=${orderNumber}`);
+        // Guaranteed navigation to order confirmation page
+        window.location.href = `/order-confirmation?order=${orderNumber}`;
       } catch {
         error("Order placement failed", "Something went wrong. Please try again.");
         setSubmitting(false);
@@ -135,12 +176,12 @@ export default function CheckoutForm() {
             });
 
             if (verifyRes.verified) {
-              clearCart();
+              saveOrderSnapshot(data, orderNumber);
               success(
                 "Payment Confirmed!",
                 `Your order ${orderNumber} has been successfully verified and confirmed.`
               );
-              router.push(`/account?tab=orders&order=${orderNumber}`);
+              window.location.href = `/order-confirmation?order=${orderNumber}`;
             } else {
               error("Payment verification failed", "Please contact support if funds were deducted.");
               setSubmitting(false);
@@ -267,7 +308,7 @@ export default function CheckoutForm() {
               />
             </div>
 
-            <div className={styles.fieldGroup}>
+            <div className={styles.field}>
               <label className={styles.selectLabel} htmlFor="country-select">
                 Country
               </label>
@@ -290,6 +331,67 @@ export default function CheckoutForm() {
         )}
       </section>
 
+      {/* ── Shipping Method ───────────────────────────────── */}
+      <section className={styles.section}>
+        <button
+          type="button"
+          className={styles.sectionHeader}
+          onClick={() => setShippingMethodOpen((v) => !v)}
+          aria-expanded={shippingMethodOpen}
+        >
+          <div className={styles.sectionTitle}>
+            <span className={styles.sectionNumber}>2</span>
+            <h2>Shipping method</h2>
+          </div>
+          {shippingMethodOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </button>
+
+        {shippingMethodOpen && (
+          <div className={styles.sectionBody}>
+            <div className={styles.paymentMethods} role="radiogroup" aria-label="Shipping method">
+              <label
+                className={[
+                  styles.paymentMethod,
+                  shippingMethod === "standard" ? styles["paymentMethod--selected"] : "",
+                ].join(" ")}
+              >
+                <input
+                  type="radio"
+                  value="standard"
+                  className={styles.paymentRadio}
+                  {...register("shippingMethod")}
+                />
+                <div className={styles.shippingMethodInfo}>
+                  <span className={styles.paymentLabel}>Standard Shipping</span>
+                  <span className={styles.shippingTime}>3-5 business days</span>
+                </div>
+                <span className={styles.shippingPrice}>Free</span>
+              </label>
+
+              <label
+                className={[
+                  styles.paymentMethod,
+                  shippingMethod === "express" ? styles["paymentMethod--selected"] : "",
+                ].join(" ")}
+              >
+                <input
+                  type="radio"
+                  value="express"
+                  className={styles.paymentRadio}
+                  {...register("shippingMethod")}
+                />
+                <div className={styles.shippingMethodInfo}>
+                  <span className={styles.paymentLabel}>Express Shipping</span>
+                  <span className={styles.shippingTime}>1-2 business days</span>
+                </div>
+                <span className={styles.shippingPrice}>$25.00</span>
+              </label>
+            </div>
+          </div>
+        )}
+      </section>
+
+
       {/* ── Payment ───────────────────────────────────────── */}
       <section className={styles.section}>
         <button
@@ -299,7 +401,7 @@ export default function CheckoutForm() {
           aria-expanded={paymentOpen}
         >
           <div className={styles.sectionTitle}>
-            <span className={styles.sectionNumber}>2</span>
+            <span className={styles.sectionNumber}>3</span>
             <h2>Payment Method</h2>
           </div>
           {paymentOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}

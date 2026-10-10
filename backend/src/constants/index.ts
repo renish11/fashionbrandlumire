@@ -105,6 +105,7 @@ export const ADMIN_NAV = [
   { label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
   { label: "Products", href: "/admin/products", icon: "Package" },
   { label: "Orders", href: "/admin/orders", icon: "ShoppingBag" },
+  { label: "Marketing", href: "/admin/marketing", icon: "Megaphone" },
   { label: "Customers", href: "/admin/customers", icon: "Users" },
   { label: "Analytics", href: "/admin/analytics", icon: "BarChart2" },
   { label: "CMS", href: "/admin/cms", icon: "FileText" },

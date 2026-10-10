@@ -14,10 +14,10 @@
   padding-inline: var(--container-padding);
 }
 
-/* Row 1 — tall left + right column */
+/* Row 1 — tall left + center collage + right vertical column */
 .bentoRow {
   display: grid;
-  grid-template-columns: 1fr 1.65fr;
+  grid-template-columns: 1fr 1.6fr 1fr;
   gap: 12px;
   height: 680px;
 }
@@ -50,7 +50,9 @@
   height: 100%;
 }
 
-.bentoRightCol {
+.bentoCenterCol,
+.bentoRightCol,
+.bentoVerticalCol {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -69,6 +71,11 @@
 }
 
 .bentoCellSm {
+  height: 100%;
+}
+
+.bentoCellVert {
+  flex: 1;
   height: 100%;
 }
 
@@ -123,7 +130,8 @@
 
 @media (max-width: 1024px) {
   .bentoRow {
-    height: 560px;
+    grid-template-columns: 1fr 1.4fr 1fr;
+    height: 580px;
   }
   .bentoRow3 {
     height: 280px;
@@ -156,6 +164,11 @@
     aspect-ratio: 1 / 1;
   }
 
+  .bentoCellVert {
+    aspect-ratio: 4 / 3;
+    flex: none;
+  }
+
   .bentoCellMd {
     aspect-ratio: 4 / 3;
   }
@@ -164,7 +177,9 @@
     aspect-ratio: unset;
   }
 
-  .bentoRightCol {
+  .bentoCenterCol,
+  .bentoRightCol,
+  .bentoVerticalCol {
     height: auto;
   }
 }

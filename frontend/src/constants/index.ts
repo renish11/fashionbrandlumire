@@ -70,6 +70,8 @@ export const ORDER_STATUS_LABELS: Record<string, string> = {
   shipped: "Shipped",
   delivered: "Delivered",
   cancelled: "Cancelled",
+  return_requested: "Return Requested",
+  returned: "Returned",
   refunded: "Refunded",
 };
 
@@ -80,6 +82,8 @@ export const ORDER_STATUS_COLORS: Record<string, string> = {
   shipped: "success",
   delivered: "success",
   cancelled: "error",
+  return_requested: "warning",
+  returned: "outline",
   refunded: "error",
 };
 
@@ -104,6 +108,7 @@ export const ADMIN_NAV = [
   { label: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
   { label: "Products", href: "/admin/products", icon: "Package" },
   { label: "Orders", href: "/admin/orders", icon: "ShoppingBag" },
+  { label: "Marketing", href: "/admin/marketing", icon: "Megaphone" },
   { label: "Customers", href: "/admin/customers", icon: "Users" },
   { label: "Analytics", href: "/admin/analytics", icon: "BarChart2" },
   { label: "CMS", href: "/admin/cms", icon: "FileText" },

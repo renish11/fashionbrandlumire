@@ -9,22 +9,7 @@ import HeroCarousel from "@/components/home/HeroCarousel";
 import type { Product } from "@/types";
 import styles from "./page.module.css";
 import NewsletterForm from "./NewsletterForm";
-
-// Inline products — no backend needed
-const ALL_PRODUCTS: Product[] = [
-  { id:"p1", slug:"silk-maxi-dress-ivory", name:"Silk Maxi Dress", brand:"Lumière", description:"Flowing silk maxi dress with a delicate ivory finish.", longDescription:"", price:485, compareAtPrice:620, images:[{id:"i1",src:"https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=800&h=1000&fit=crop",alt:"Silk Maxi Dress",width:800,height:1000}], category:"dresses", collectionId:"ss26", tags:["silk","maxi"], colors:[{name:"Ivory",hex:"#FFFFF0"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.7, reviewCount:24, isFeatured:true, isNew:false, isBestseller:true, stock:14, materials:[], care:[], sku:"LUM-SMD-001", createdAt:"2026-01-15" },
-  { id:"p2", slug:"floral-wrap-dress-red", name:"Floral Wrap Dress", brand:"Lumière", description:"Vibrant floral-print wrap dress in lightweight crepe.", longDescription:"", price:320, compareAtPrice:395, images:[{id:"i1",src:"https://images.unsplash.com/photo-1572804013427-4d7ca7268217?w=800&h=1000&fit=crop",alt:"Floral Wrap Dress",width:800,height:1000}], category:"dresses", collectionId:"ss26", tags:["floral","wrap"], colors:[{name:"Red Floral",hex:"#C0392B"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.8, reviewCount:19, isFeatured:true, isNew:true, isBestseller:false, stock:18, materials:[], care:[], sku:"LUM-FWD-001", createdAt:"2026-03-20" },
-  { id:"p3", slug:"bodycon-midi-dress-black", name:"Bodycon Midi Dress", brand:"Lumière", description:"Sleek bodycon midi dress in stretch jersey.", longDescription:"", price:285, compareAtPrice:undefined, images:[{id:"i1",src:"https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&h=1000&fit=crop",alt:"Bodycon Midi Dress",width:800,height:1000}], category:"dresses", collectionId:"ss26", tags:["bodycon"], colors:[{name:"Black",hex:"#000000"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.6, reviewCount:32, isFeatured:false, isNew:false, isBestseller:true, stock:21, materials:[], care:[], sku:"LUM-BMD-001", createdAt:"2025-11-10" },
-  { id:"p4", slug:"boho-maxi-dress-sage", name:"Boho Maxi Dress", brand:"Lumière", description:"Free-spirited boho maxi dress in sage green.", longDescription:"", price:275, compareAtPrice:340, images:[{id:"i1",src:"https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800&h=1000&fit=crop",alt:"Boho Maxi Dress",width:800,height:1000}], category:"dresses", collectionId:"resort26", tags:["boho","maxi"], colors:[{name:"Sage",hex:"#9DC183"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.9, reviewCount:28, isFeatured:true, isNew:true, isBestseller:true, stock:17, materials:[], care:[], sku:"LUM-BHM-001", createdAt:"2026-04-15" },
-  { id:"p5", slug:"velvet-slip-dress-emerald", name:"Velvet Slip Dress", brand:"Lumière", description:"Luxurious velvet slip dress in deep emerald.", longDescription:"", price:420, compareAtPrice:520, images:[{id:"i1",src:"https://images.unsplash.com/photo-1551803091-e20673f15770?w=800&h=1000&fit=crop",alt:"Velvet Slip Dress",width:800,height:1000}], category:"dresses", collectionId:"aw25", tags:["velvet","evening"], colors:[{name:"Emerald",hex:"#50C878"}], sizes:["XS","S","M","L"], variants:[], reviews:[], rating:4.9, reviewCount:22, isFeatured:true, isNew:false, isBestseller:true, stock:12, materials:[], care:[], sku:"LUM-VSD-001", createdAt:"2025-10-05" },
-  { id:"p6", slug:"merino-ribbed-turtleneck", name:"Merino Ribbed Turtleneck", brand:"Lumière", description:"Finest merino wool ribbed turtleneck.", longDescription:"", price:195, compareAtPrice:undefined, images:[{id:"i1",src:"https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&h=1000&fit=crop",alt:"Merino Turtleneck",width:800,height:1000}], category:"tops", collectionId:"aw25", tags:["merino","knitwear"], colors:[{name:"Camel",hex:"#C19A6B"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.8, reviewCount:31, isFeatured:true, isNew:false, isBestseller:true, stock:25, materials:[], care:[], sku:"LUM-MRT-001", createdAt:"2025-09-15" },
-  { id:"p7", slug:"cashmere-coat-camel", name:"Cashmere Blend Coat", brand:"Lumière", description:"Double-faced cashmere coat in warm camel.", longDescription:"", price:1250, compareAtPrice:undefined, images:[{id:"i1",src:"https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=800&h=1000&fit=crop",alt:"Cashmere Coat",width:800,height:1000}], category:"outerwear", collectionId:"aw25", tags:["cashmere","coat"], colors:[{name:"Camel",hex:"#C19A6B"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.9, reviewCount:18, isFeatured:true, isNew:false, isBestseller:true, stock:7, materials:[], care:[], sku:"LUM-CCT-001", createdAt:"2025-10-01" },
-  { id:"p8", slug:"classic-trench-coat-beige", name:"Classic Trench Coat", brand:"Lumière", description:"The iconic trench coat in cotton gabardine.", longDescription:"", price:785, compareAtPrice:940, images:[{id:"i1",src:"https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&h=1000&fit=crop",alt:"Classic Trench Coat",width:800,height:1000}], category:"outerwear", collectionId:"ss26", tags:["trench","coat"], colors:[{name:"Beige",hex:"#F5F5DC"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.8, reviewCount:24, isFeatured:true, isNew:false, isBestseller:true, stock:12, materials:[], care:[], sku:"LUM-CTC-001", createdAt:"2026-01-05" },
-  { id:"p9", slug:"satin-party-dress-rose", name:"Satin Party Dress", brand:"Lumière", description:"Sleek satin midi dress with a plunge neckline.", longDescription:"", price:365, compareAtPrice:440, images:[{id:"i1",src:"https://images.unsplash.com/photo-1612722432474-b971cdcea546?w=800&h=1000&fit=crop",alt:"Satin Party Dress",width:800,height:1000}], category:"dresses", collectionId:"ss26", tags:["satin","party"], colors:[{name:"Rose",hex:"#FF007F"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.6, reviewCount:17, isFeatured:false, isNew:true, isBestseller:false, stock:14, materials:[], care:[], sku:"LUM-SPD-001", createdAt:"2026-02-28" },
-  { id:"p10", slug:"maxi-evening-gown-black", name:"Maxi Evening Gown", brand:"Lumière", description:"Floor-sweeping column gown in stretch crepe.", longDescription:"", price:895, compareAtPrice:undefined, images:[{id:"i1",src:"https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=800&h=1000&fit=crop",alt:"Maxi Evening Gown",width:800,height:1000}], category:"dresses", collectionId:"ss26", tags:["gown","evening"], colors:[{name:"Black",hex:"#000000"}], sizes:["XS","S","M","L"], variants:[], reviews:[], rating:5.0, reviewCount:8, isFeatured:true, isNew:false, isBestseller:false, stock:9, materials:[], care:[], sku:"LUM-MEG-001", createdAt:"2026-02-20" },
-  { id:"p11", slug:"casual-sundress-yellow", name:"Casual Sundress", brand:"Lumière", description:"Bright and breezy sundress in butter yellow cotton.", longDescription:"", price:165, compareAtPrice:210, images:[{id:"i1",src:"https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800&h=1000&fit=crop",alt:"Casual Sundress",width:800,height:1000}], category:"dresses", collectionId:"ss26", tags:["casual","sundress"], colors:[{name:"Butter Yellow",hex:"#FFFD82"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.7, reviewCount:36, isFeatured:false, isNew:false, isBestseller:true, stock:30, materials:[], care:[], sku:"LUM-CSD-001", createdAt:"2026-01-20" },
-  { id:"p12", slug:"ribbed-knit-midi-dress-chocolate", name:"Ribbed Knit Midi Dress", brand:"Lumière", description:"A sculpted ribbed knit midi dress in chocolate brown.", longDescription:"", price:355, compareAtPrice:425, images:[{id:"i1",src:"https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&h=1000&fit=crop",alt:"Ribbed Knit Midi Dress",width:800,height:1000}], category:"dresses", collectionId:"aw25", tags:["knit","midi"], colors:[{name:"Chocolate",hex:"#7B3F00"}], sizes:["XS","S","M","L","XL"], variants:[], reviews:[], rating:4.7, reviewCount:29, isFeatured:true, isNew:false, isBestseller:true, stock:16, materials:[], care:[], sku:"LUM-RKD-001", createdAt:"2025-10-30" },
-];
+import ALL_PRODUCTS from "@/data/products";
 
 export default async function HomePage() {
   const featured = ALL_PRODUCTS.filter((p) => p.isFeatured).slice(0, 4);
@@ -88,8 +73,8 @@ export default async function HomePage() {
                 </div>
               </Link>
 
-              {/* Right column */}
-              <div className={styles.bentoRightCol}>
+              {/* Center collage column */}
+              <div className={styles.bentoCenterCol}>
 
                 {/* Cell 2 — Wide top: Summer dresses */}
                 <Link href="/shop?category=summer" className={`${styles.bentoCell} ${styles.bentoCellWide}`}>
@@ -97,7 +82,7 @@ export default async function HomePage() {
                     src="https://images.unsplash.com/photo-1572804013427-4d7ca7268217?w=1000&h=600&fit=crop"
                     alt="Summer Dresses"
                     fill
-                    sizes="(max-width: 768px) 100vw, 55vw"
+                    sizes="(max-width: 768px) 100vw, 40vw"
                     style={{ objectFit: "cover", objectPosition: "center 30%" }}
                   />
                   <div className={styles.bentoOverlay} />
@@ -116,7 +101,7 @@ export default async function HomePage() {
                       src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=700&fit=crop"
                       alt="Casual Dresses"
                       fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
+                      sizes="(max-width: 768px) 50vw, 20vw"
                       style={{ objectFit: "cover", objectPosition: "center top" }}
                     />
                     <div className={styles.bentoOverlay} />
@@ -132,7 +117,7 @@ export default async function HomePage() {
                       src="https://images.unsplash.com/photo-1612722432474-b971cdcea546?w=600&h=700&fit=crop"
                       alt="Maxi Dresses"
                       fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
+                      sizes="(max-width: 768px) 50vw, 20vw"
                       style={{ objectFit: "cover", objectPosition: "center top" }}
                     />
                     <div className={styles.bentoOverlay} />
@@ -143,6 +128,43 @@ export default async function HomePage() {
                   </Link>
 
                 </div>
+              </div>
+
+              {/* ── Right Vertical Line Column: Women Fashion Dresses ── */}
+              <div className={styles.bentoVerticalCol}>
+
+                {/* Vertical Cell A — Cocktail & Party Dresses */}
+                <Link href="/shop?category=party" className={`${styles.bentoCell} ${styles.bentoCellVert}`}>
+                  <Image
+                    src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&h=1000&fit=crop"
+                    alt="Cocktail Dresses"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    style={{ objectFit: "cover", objectPosition: "center top" }}
+                  />
+                  <div className={styles.bentoOverlay} />
+                  <div className={styles.bentoCellLabel}>
+                    <span className={styles.bentoCellEyebrow}>Soirée</span>
+                    <span className={styles.bentoCellTitle}>Cocktail Dresses</span>
+                  </div>
+                </Link>
+
+                {/* Vertical Cell B — Silk & Satin Gowns */}
+                <Link href="/shop?category=dresses" className={`${styles.bentoCell} ${styles.bentoCellVert}`}>
+                  <Image
+                    src="https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?w=800&h=1000&fit=crop"
+                    alt="Silk Gowns"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    style={{ objectFit: "cover", objectPosition: "center top" }}
+                  />
+                  <div className={styles.bentoOverlay} />
+                  <div className={styles.bentoCellLabel}>
+                    <span className={styles.bentoCellEyebrow}>Couture</span>
+                    <span className={styles.bentoCellTitle}>Silk & Satin Gowns</span>
+                  </div>
+                </Link>
+
               </div>
             </div>
 
